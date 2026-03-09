@@ -6,7 +6,7 @@
 
 pfngouin is designed to feel exactly like pingouin (same function names, same return format) but with covariate adjustment built in. Just pass your pre-experiment covariates and get the same test with narrower confidence intervals and lower p-values (if the alternative hypothesis being tested is true).
 
-The default model for doing covariate adjustment is a prior-fitted network (PFN). PFNs are state-of-the-art on small to medium-sized datasets, require little tuning, and perform training and inference in a single transformer forward pass, reducing a lot of overhead compared to traditional prediction models. Using a simple linear model and XGBoost are however also supported by pfngouin.
+The default model for doing covariate adjustment is a prior-fitted network (PFN). PFNs are state-of-the-art on small to medium-sized datasets, require little tuning, and perform training and inference in a single transformer forward pass, reducing a lot of overhead compared to traditional prediction models. These properties make them a good fit for the covariate adjustment used in this package.  Using common alternatives such as a simple linear model and XGBoost are however also supported by pfngouin.
 
 ## Quick start
 
