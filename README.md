@@ -14,15 +14,14 @@ pfngouin is a direct extension of pingouin. Replacing pingouin with pfngouin is 
 
 ```python
 # plain pingouin
-import pingouin as pg
+import pingouin
 
-# 
-result = pg.ttest(treatment, control)
+result = pingouin.ttest(treatment, control)
 
 # pfngouin with covariate adjustment
-import pfngouin as ppg
+import pfngouin
 
-result = ppg.ttest(
+result = pfngouin.ttest(
     control,
     treatment,
     covariates_control=X_ctrl,    # (n_ctrl, n_covariates)
@@ -73,10 +72,10 @@ When the model is complex enough (TabPFN, XGBoost), fitting and predicting on th
 
 ## Results
 
-Comparison of methods on a synthetic A/B test (N=1000); see [notebooks/tutorial.ipynb](notebooks/tutorial.ipynb) for details.
+Comparison of methods on a synthetic A/B test (N=1000); see [notebooks/simulation.ipynb](notebooks/simulation.ipynb) for details.
 Note that lower p-values are better here, which only holds because a treatment effect is present and the null hypothesis is false in the simulation. 
 
-![Method comparison](notebooks/tutorial_results.png)
+![Method comparison](notebooks/simulation_results.png)
 
 
 ## Installation
