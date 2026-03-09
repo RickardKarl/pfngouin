@@ -74,7 +74,7 @@ When the model is complex enough (TabPFN, XGBoost), fitting and predicting on th
 
 ## Results
 
-Comparison of methods on a synthetic A/B test (N=1000); see [notebooks/simulation.ipynb](notebooks/simulation.ipynb) for details.
+Comparison of methods on a synthetic A/B test using a t-test; see [notebooks/simulation.ipynb](notebooks/simulation.ipynb) for details.
 Note that lower p-values are better here, which only holds because a treatment effect is present and the null hypothesis is false in the simulation. 
 
 ![Method comparison](notebooks/simulation_results.png)
