@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import contextlib
+import io
 from typing import ClassVar
 
 import numpy as np
@@ -28,4 +30,6 @@ class TabPFNModel(BaseOutcomeModel):
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        return np.asarray(self._model.predict(X), dtype=float)
+        with contextlib.redirect_stderr(io.StringIO()):
+            result = self._model.predict(X)
+        return np.asarray(result, dtype=float)
