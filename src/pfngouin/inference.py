@@ -8,7 +8,7 @@ by the covariate adjustment.
 
 Supported tests:
     ttest       - Welch / Student t-test (pg.ttest)
-    more to be added: mwu, welch_anova, chi2
+    mwu         - Mann-Whitney U test (pg.mwu)
 
 Usage:
     import numpy as np
@@ -57,9 +57,14 @@ def ttest(
 
     Parameters
     ----------
-    control, treatment          : 1-D arrays of observed outcomes
-    covariates_control,
-    covariates_treatment        : 2-D covariate arrays (n_users × n_features)
+    control                     : 1-D array of observed outcomes, shape (n_control,)
+    treatment                   : 1-D array of observed outcomes, shape (n_treatment,).
+    covariates_control          : covariate array for the control group,
+                                    shape (n_control,) or (n_control, n_features).
+                                    Must have the same number of rows as control.
+    covariates_treatment        : covariate array for the treatment group,
+                                    shape (n_treatment,) or (n_treatment, n_features).
+                                    Must have the same number of rows as treatment.
     model                       : outcome model for variance reduction
     n_splits                    : number of cross-fitting folds (default 5,
                                   used only when model.crossfit_required is True)
@@ -80,5 +85,54 @@ def ttest(
         random_state,
     )
     result: pd.DataFrame = pg.ttest(treatment_adj, control_adj, **kwargs)
+    result["var_reduction"] = round(var_reduction, 4)
+    return result
+
+
+def mwu(
+    control: np.ndarray,
+    treatment: np.ndarray,
+    covariates_control: np.ndarray,
+    covariates_treatment: np.ndarray,
+    model: BaseOutcomeModel = TabPFNModel(),
+    n_splits: int = 5,
+    random_state: int | None = None,
+    **kwargs: Any,
+) -> pd.DataFrame:
+    """
+    Mann-Whitney U test with CUPED variance reduction.
+
+    Mirrors pg.mwu(x, y, **kwargs).
+
+    Parameters
+    ----------
+    control                     : 1-D array of observed outcomes, shape (n_control,)
+    treatment                   : 1-D array of observed outcomes, shape (n_treatment,).
+    covariates_control          : covariate array for the control group,
+                                  shape (n_control,) or (n_control, n_features).
+                                  Must have the same number of rows as control.
+    covariates_treatment        : covariate array for the treatment group,
+                                  shape (n_treatment,) or (n_treatment, n_features).
+                                  Must have the same number of rows as treatment.
+    model                       : outcome model for variance reduction
+    n_splits                    : number of cross-fitting folds (default 5,
+                                  used only when model.crossfit_required is True)
+    random_state                : random seed for reproducibility
+    **kwargs                    : passed directly to pg.mwu
+
+    Returns
+    -------
+    pandas.DataFrame identical to pg.mwu output + 'var_reduction' column
+    """
+    control_adj, treatment_adj, var_reduction = _adjust(
+        model,
+        control,
+        treatment,
+        covariates_control,
+        covariates_treatment,
+        n_splits,
+        random_state,
+    )
+    result: pd.DataFrame = pg.mwu(treatment_adj, control_adj, **kwargs)
     result["var_reduction"] = round(var_reduction, 4)
     return result

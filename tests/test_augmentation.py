@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-import pfngouin as ppg
+import pfngouin as pfg
 
 # ---------------------------------------------------------------------------
 # Shared fixture
@@ -9,9 +9,9 @@ import pfngouin as ppg
 
 
 @pytest.fixture()
-def linear_model() -> ppg.LinearModel:
+def linear_model() -> pfg.LinearModel:
     pytest.importorskip("sklearn")
-    return ppg.LinearModel()
+    return pfg.LinearModel()
 
 
 # ---------------------------------------------------------------------------
@@ -20,9 +20,9 @@ def linear_model() -> ppg.LinearModel:
 
 
 def test_ttest_returns_dataframe(
-    ab_data: dict, linear_model: ppg.LinearModel
+    ab_data: dict, linear_model: pfg.LinearModel
 ) -> None:  # type: ignore[type-arg]
-    result = ppg.ttest(
+    result = pfg.ttest(
         ab_data["a"],
         ab_data["b"],
         covariates_control=ab_data["covariates_a"],
@@ -36,9 +36,9 @@ def test_ttest_returns_dataframe(
 
 
 def test_ttest_var_reduction_in_range(
-    ab_data: dict, linear_model: ppg.LinearModel
+    ab_data: dict, linear_model: pfg.LinearModel
 ) -> None:  # type: ignore[type-arg]
-    result = ppg.ttest(
+    result = pfg.ttest(
         ab_data["a"],
         ab_data["b"],
         covariates_control=ab_data["covariates_a"],
@@ -50,12 +50,12 @@ def test_ttest_var_reduction_in_range(
     assert 0.0 <= vr <= 1.0
 
 
-def test_ttest_reduces_pvalue(ab_data: dict, linear_model: ppg.LinearModel) -> None:  # type: ignore[type-arg]
+def test_ttest_reduces_pvalue(ab_data: dict, linear_model: pfg.LinearModel) -> None:  # type: ignore[type-arg]
     # With a strong covariate (fixed seed), adjusted p-value should be <= original.
     import pingouin as pg
 
     original = pg.ttest(ab_data["b"], ab_data["a"])
-    adjusted = ppg.ttest(
+    adjusted = pfg.ttest(
         ab_data["a"],
         ab_data["b"],
         covariates_control=ab_data["covariates_a"],
@@ -72,10 +72,10 @@ def test_ttest_reduces_pvalue(ab_data: dict, linear_model: ppg.LinearModel) -> N
 
 
 def test_mismatched_control_covariates_raises(
-    ab_data: dict, linear_model: ppg.LinearModel
+    ab_data: dict, linear_model: pfg.LinearModel
 ) -> None:  # type: ignore[type-arg]
     with pytest.raises(ValueError, match="control"):
-        ppg.ttest(
+        pfg.ttest(
             ab_data["a"],
             ab_data["b"],
             covariates_control=ab_data["covariates_a"][:-1],  # one row short
@@ -85,10 +85,10 @@ def test_mismatched_control_covariates_raises(
 
 
 def test_mismatched_treatment_covariates_raises(
-    ab_data: dict, linear_model: ppg.LinearModel
+    ab_data: dict, linear_model: pfg.LinearModel
 ) -> None:  # type: ignore[type-arg]
     with pytest.raises(ValueError, match="treatment"):
-        ppg.ttest(
+        pfg.ttest(
             ab_data["a"],
             ab_data["b"],
             covariates_control=ab_data["covariates_a"],
