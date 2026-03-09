@@ -12,6 +12,25 @@ import numpy as np
 from .models.base import BaseOutcomeModel
 
 
+def _validate_shapes(
+    control: np.ndarray,
+    treatment: np.ndarray,
+    covariates_control: np.ndarray,
+    covariates_treatment: np.ndarray,
+) -> None:
+    """Raise ValueError if outcome and covariate array lengths are inconsistent."""
+    if len(control) != len(covariates_control):
+        raise ValueError(
+            f"control has {len(control)} rows but covariates_control has "
+            f"{len(covariates_control)} rows."
+        )
+    if len(treatment) != len(covariates_treatment):
+        raise ValueError(
+            f"treatment has {len(treatment)} rows but covariates_treatment has "
+            f"{len(covariates_treatment)} rows."
+        )
+
+
 def _crossfit_predict(
     model: BaseOutcomeModel,
     X: np.ndarray,
@@ -71,8 +90,13 @@ def _adjust(
     """
     control = np.asarray(control, dtype=float)
     treatment = np.asarray(treatment, dtype=float)
-    X_ctrl = np.atleast_2d(np.asarray(covariates_control, dtype=float))
-    X_trt = np.atleast_2d(np.asarray(covariates_treatment, dtype=float))
+    covariates_control = np.asarray(covariates_control, dtype=float)
+    covariates_treatment = np.asarray(covariates_treatment, dtype=float)
+
+    _validate_shapes(control, treatment, covariates_control, covariates_treatment)
+
+    X_ctrl = np.atleast_2d(covariates_control)
+    X_trt = np.atleast_2d(covariates_treatment)
 
     # Combine across groups — theta must be estimated on the full dataset
     X = np.vstack([X_ctrl, X_trt])
