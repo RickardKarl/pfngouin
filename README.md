@@ -38,6 +38,8 @@ T-test   3.142  1997.1   two-sided  0.0019  [0.3, 2.1]  0.112   0.89          0.
 
 More examples are found in [notebooks/tutorial.ipynb](notebooks/tutorial.ipynb).
 
+Note: The current implementation uses TabPFN via their cloud-based Python API, and an API key is required (you will be prompted for one on the first run). More information in this [GitHub repo](https://github.com/PriorLabs/tabpfn-client).
+
 ## How the variance reduction works
 
 pfngouin implements Controlled-experiment Using Pre-Experiment Data (CUPED), using a predictive model to remove predictable variance from the outcomes before running the test.
