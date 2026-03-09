@@ -31,10 +31,12 @@ result = pfngouin.ttest(
 
 The return value is a `pandas.DataFrame` identical to [`pingouin.ttest`](https://pingouin-stats.org/generated/pingouin.ttest.html), with one extra column called `var_reduction`:
 
-```text
-              T    dof alternative    p_val          CI95%  cohen_d   power  var_reduction
-T-test  3.142  ...         two-sided  0.0019  [0.3, 2.1]    0.112   0.89          0.352
 ```
+             T     dof alternative  p_val      CI95%  cohen_d  power  var_reduction
+T-test   3.142  1997.1   two-sided  0.0019  [0.3, 2.1]  0.112   0.89          0.352
+```
+
+More examples are found in [notebooks/tutorial.ipynb](notebooks/tutorial.ipynb).
 
 ## How the variance reduction works
 
