@@ -1,7 +1,7 @@
 """
 _core.py
 --------
-Internal helpers for ML-CUPED variance reduction.
+Internal helpers for CUPED variance reduction.
 Not part of the public API.
 """
 

@@ -1,16 +1,14 @@
 """
 inference.py
 ------------
-Pingouin-mirroring statistical tests with ML-CUPED variance reduction.
+Pingouin-mirroring statistical tests with CUPED variance reduction.
 Each function mirrors the pingouin API and returns the same DataFrame format,
 with an added 'var_reduction' column showing how much variance was explained
 by the covariate adjustment.
 
 Supported tests:
     ttest       - Welch / Student t-test (pg.ttest)
-    mwu         - Mann-Whitney U (pg.mwu)
-    welch_anova - One-way Welch ANOVA (pg.welch_anova)
-    chi2        - Chi-squared independence (pg.chi2_independence)
+    more to be added: mwu, welch_anova, chi2
 
 Usage:
     import numpy as np
@@ -52,7 +50,7 @@ def ttest(
     **kwargs: Any,
 ) -> pd.DataFrame:
     """
-    T-test (Welch by default) with ML-CUPED variance reduction.
+    T-test (Welch by default) with CUPED variance reduction.
 
     Mirrors pg.ttest(x, y, **kwargs). The 'paired' kwarg is not supported
     here because CUPED assumes independent groups.

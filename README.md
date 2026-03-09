@@ -2,11 +2,40 @@
 
 > **Experimental** — this package is in early development and not ready for deployment. More tests from pingouin will be continuously added over time.
 
-**A plug-and-play extension of [pingouin](https://pingouin-stats.org/) that adds prediction-powered variance reduction to standard statistical tests.**
+**A plug-and-play extension of [pingouin](https://pingouin-stats.org/) that adds PFN-powered variance reduction to standard statistical tests.**
 
 pfngouin is designed to feel exactly like pingouin (same function names, same return format) but with covariate adjustment built in. Just pass your pre-experiment covariates and get the same test with narrower confidence intervals and lower p-values (if the alternative hypothesis being tested is true).
 
-The default model for predictions is a prior-fitted network (PFN). PFNs are state-of-the-art on small to medium-sized datasets, require little tuning, and perform training and inference in a single transformer forward pass, reducing overhead compared to traditional prediction models. A simple linear model and XGBoost are also supported by pfngouin.
+The default model for doing covariate adjustment is a prior-fitted network (PFN). PFNs are state-of-the-art on small to medium-sized datasets, require little tuning, and perform training and inference in a single transformer forward pass, reducing a lot of overhead compared to traditional prediction models. Using a simple linear model and XGBoost are however also supported by pfngouin.
+
+## Quick start
+
+pfngouin is a direct extension of pingouin. Replacing pingouin with pfngouin is straightforward:
+
+```python
+# plain pingouin
+import pingouin as pg
+
+# 
+result = pg.ttest(treatment, control)
+
+# pfngouin with covariate adjustment
+import pfngouin as ppg
+
+result = ppg.ttest(
+    control,
+    treatment,
+    covariates_control=X_ctrl,    # (n_ctrl, n_covariates)
+    covariates_treatment=X_trt    # (n_trt, n_covariates)
+)
+```
+
+The return value is a `pandas.DataFrame` identical to [`pingouin.ttest`](https://pingouin-stats.org/generated/pingouin.ttest.html), with one extra column called `var_reduction`:
+
+```text
+              T    dof alternative    p_val          CI95%  cohen_d   power  var_reduction
+T-test  3.142  ...         two-sided  0.0019  [0.3, 2.1]    0.112   0.89          0.352
+```
 
 ## How the variance reduction works
 
@@ -42,6 +71,14 @@ Values range from 0 (covariates add nothing) to 1 (outcomes are perfectly predic
 
 When the model is complex enough (TabPFN, XGBoost), fitting and predicting on the same data would inflate `var_reduction` and bias the adjustment. pfngouin uses k-fold cross-fitting: the model is fit on `k - 1` folds and predictions are made on the held-out fold, cycling through all folds. This keeps the adjustment unbiased regardless of model complexity. Linear models are exempt (they are fit on the full dataset) because their low capacity makes overfitting negligible.
 
+## Results
+
+Comparison of methods on a synthetic A/B test (N=1000); see [notebooks/tutorial.ipynb](notebooks/tutorial.ipynb) for details.
+Note that lower p-values are better here, which only holds because a treatment effect is present and the null hypothesis is false in the simulation. 
+
+![Method comparison](notebooks/tutorial_results.png)
+
+
 ## Installation
 
 Clone the repository and install locally:
@@ -57,43 +94,6 @@ With XGBoost support:
 ```bash
 uv sync --extra xgboost
 ```
-
-
-## Quick start
-
-pfngouin is a direct extension of pingouin. Replacing pingouin with pfngouin is straightforward:
-
-```python
-# plain pingouin
-import pingouin as pg
-
-# treatment and control are (n_samples, 1) arrays
-result = pg.ttest(treatment, control)
-
-# pfngouin with covariate adjustment
-import pfngouin
-
-result = pfngouin.ttest(
-    control,
-    treatment,
-    covariates_control=X_ctrl,    # pre-experiment covariate matrix (n_samples, n_covariates)
-    covariates_treatment=X_trt
-)
-```
-
-The return value is a `pandas.DataFrame` identical to [`pingouin.ttest`](https://pingouin-stats.org/generated/pingouin.ttest.html), with one extra column called `var_reduction`:
-
-```text
-              T    dof alternative    p_val          CI95%  cohen_d   power  var_reduction
-T-test  3.142  ...         two-sided  0.0019  [0.3, 2.1]    0.112   0.89          0.352
-```
-
-## Results
-
-Comparison of methods on a synthetic A/B test (N=1000); see [notebooks/tutorial.ipynb](notebooks/tutorial.ipynb) for details.
-Note that lower p-values are better here, which only holds because a treatment effect is present and the null hypothesis is false in the simulation. 
-
-![Method comparison](notebooks/tutorial_results.png)
 
 
 ## Development
