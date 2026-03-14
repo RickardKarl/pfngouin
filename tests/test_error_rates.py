@@ -177,32 +177,32 @@ def test_mwu_type1_error_tabpfn(tabpfn_model: pfg.TabPFNModel) -> None:
 
 def test_ttest_power_no_adjustment() -> None:
     power = _estimate_rejection_rate(_pg_ttest, None, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 def test_ttest_power_linear(linear_model: pfg.LinearModel) -> None:
     power = _estimate_rejection_rate(pfg.ttest, linear_model, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
 def test_ttest_power_xgboost(xgboost_model: pfg.XGBoostModel) -> None:
     power = _estimate_rejection_rate(pfg.ttest, xgboost_model, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
 def test_ttest_power_tabpfn(tabpfn_model: pfg.TabPFNModel) -> None:
     power = _estimate_rejection_rate(pfg.ttest, tabpfn_model, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -212,29 +212,29 @@ def test_ttest_power_tabpfn(tabpfn_model: pfg.TabPFNModel) -> None:
 
 def test_mwu_power_no_adjustment() -> None:
     power = _estimate_rejection_rate(_pg_mwu, None, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 def test_mwu_power_linear(linear_model: pfg.LinearModel) -> None:
     power = _estimate_rejection_rate(pfg.mwu, linear_model, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
 def test_mwu_power_xgboost(xgboost_model: pfg.XGBoostModel) -> None:
     power = _estimate_rejection_rate(pfg.mwu, xgboost_model, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
 def test_mwu_power_tabpfn(tabpfn_model: pfg.TabPFNModel) -> None:
     power = _estimate_rejection_rate(pfg.mwu, tabpfn_model, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
