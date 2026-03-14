@@ -19,9 +19,7 @@ def linear_model() -> pfg.LinearModel:
 # ---------------------------------------------------------------------------
 
 
-def test_ttest_returns_dataframe(
-    ab_data: dict, linear_model: pfg.LinearModel
-) -> None:  # type: ignore[type-arg]
+def test_ttest_returns_dataframe(ab_data: dict, linear_model: pfg.LinearModel) -> None:  # type: ignore[type-arg]
     result = pfg.ttest(
         ab_data["a"],
         ab_data["b"],
