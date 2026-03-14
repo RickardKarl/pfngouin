@@ -27,6 +27,10 @@ path = "src/pfngouin/__init__.py"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "-m 'not ml_models'"
+markers = [
+    "ml_models: tests that run XGBoost or TabPFN (excluded by default, run with -m ml_models)",
+]
 
 [tool.ruff]
 src = ["src"]
