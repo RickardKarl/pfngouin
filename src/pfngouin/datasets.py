@@ -1,7 +1,7 @@
 """
-data_generation.py
-------------------
-Synthetic A/B test data for the pfngouin tutorial notebook.
+datasets.py
+-----------
+Synthetic A/B test data for notebooks and tests.
 """
 
 from __future__ import annotations
