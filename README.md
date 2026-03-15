@@ -88,18 +88,22 @@ Note that lower p-values are better here, which only holds because a treatment e
 
 ## Installation
 
-Clone the repository and install locally:
-
 ```bash
-git clone https://github.com/RickardKarl/pfngouin.git
-cd pfngouin
-uv sync
+pip install pfngouin
 ```
 
 With XGBoost support:
 
 ```bash
-uv sync --extra xgboost
+pip install "pfngouin[xgboost]"
+```
+
+Or, to install from source:
+
+```bash
+git clone https://github.com/RickardKarl/pfngouin.git
+cd pfngouin
+uv sync
 ```
 
 
