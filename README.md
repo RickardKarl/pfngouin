@@ -1,7 +1,7 @@
 # pfngouin
 
 [![PyPI](https://img.shields.io/pypi/v/pfngouin)](https://pypi.org/project/pfngouin/)
-[![License](https://img.shields.io/pypi/l/pfngouin)](./LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
 
 > **Experimental** — this package is in early development and not ready for deployment. More tests from pingouin will be continuously added over time.
