@@ -1,5 +1,9 @@
 # pfngouin
 
+[![PyPI](https://img.shields.io/pypi/v/pfngouin)](https://pypi.org/project/pfngouin/)
+[![License](https://img.shields.io/pypi/l/pfngouin)](./LICENSE)
+
+
 > **Experimental** — this package is in early development and not ready for deployment. More tests from pingouin will be continuously added over time.
 
 **A plug-and-play extension of [pingouin](https://pingouin-stats.org/) that adds PFN-powered variance reduction to standard statistical tests.**
