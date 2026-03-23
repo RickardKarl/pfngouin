@@ -1,3 +1,9 @@
+"""
+xgboost.py
+----------
+XGBoost outcome model with optional randomised hyperparameter tuning.
+"""
+
 from __future__ import annotations
 
 from typing import Any, ClassVar
@@ -19,8 +25,6 @@ _DEFAULT_PARAM_GRID: dict[str, list[Any]] = {
 class XGBoostModel(BaseOutcomeModel):
     """Outcome model backed by XGBoost's XGBRegressor.
 
-    Requires xgboost: ``pip install xgboost``.
-
     Parameters
     ----------
     tune:
@@ -34,8 +38,7 @@ class XGBoostModel(BaseOutcomeModel):
         Number of cross-validation folds used during tuning.
     n_jobs:
         Number of parallel jobs for ``RandomizedSearchCV`` when
-        ``tune=True``.  ``-1`` uses all available CPU cores.  Default 1
-        (sequential).
+        ``tune=True``.  ``-1`` uses all available CPU cores.  Default -1.
     param_grid:
         Override the default hyperparameter search grid.  Must be a dict
         mapping XGBRegressor parameter names to lists of candidate values.
@@ -69,6 +72,7 @@ class XGBoostModel(BaseOutcomeModel):
         self._param_grid = param_grid if param_grid is not None else _DEFAULT_PARAM_GRID
         self._random_state = random_state
         self._xgb_kwargs = xgb_kwargs
+        xgb_kwargs.setdefault("verbosity", 0)  # type: ignore[attr-defined]
         self._model = XGBRegressor(**xgb_kwargs)
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> XGBoostModel:
@@ -78,7 +82,7 @@ class XGBoostModel(BaseOutcomeModel):
             )
             from xgboost import XGBRegressor  # type: ignore[import]
 
-            base = XGBRegressor(verbosity=0, **self._xgb_kwargs)
+            base = XGBRegressor(**self._xgb_kwargs)
             search = RandomizedSearchCV(
                 base,
                 self._param_grid,

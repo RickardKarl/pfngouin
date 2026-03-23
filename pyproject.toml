@@ -11,7 +11,15 @@ authors = [
     { name = "Rickard Karlsson" },
 ]
 readme = "README.md"
-dependencies = ["numpy>=1.24", "scipy>=1.11", "pingouin>=0.5", "pandas>=1.5", "scikit-learn>=1.3", "tabpfn-client>=0.0.8"]
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.11",
+    "pingouin>=0.5",
+    "pandas>=1.5",
+    "scikit-learn>=1.3",
+    "tabpfn-client>=0.0.8",
+    "tabicl>=2.0.3",
+]
 
 [project.optional-dependencies]
 dev = [
@@ -19,17 +27,28 @@ dev = [
     "pytest-cov>=5.0",
     "ruff>=0.4",
     "mypy>=1.10",
+    "xgboost>=2.0",
 ]
 xgboost = ["xgboost>=2.0", "scikit-learn>=1.3"]
 
 [tool.hatch.version]
 path = "src/pfngouin/__init__.py"
 
+[tool.uv]
+required-environments = [
+    "sys_platform == 'darwin' and platform_machine == 'x86_64'",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-m 'not ml_models'"
+pythonpath = ["tests"]
+addopts = "-m 'not (ml_models or pfn or xgboost or simulations)'"
 markers = [
-    "ml_models: tests that run XGBoost or TabPFN (excluded by default, run with -m ml_models)",
+    "ml_models: tests that require any external ML model (excluded by default)",
+    "pfn: tests that require tabpfn-client or tabicl (subset of ml_models)",
+    "xgboost: tests that require xgboost (subset of ml_models)",
+    "simulations: slow simulation-based statistical tests (excluded by default)",
+    "tabicl: tests that require tabicl (subset of ml_models)",
 ]
 
 [tool.ruff]

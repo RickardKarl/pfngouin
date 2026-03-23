@@ -1,15 +1,34 @@
 __version__ = "0.1.0"
 
-from .datasets import make_experiment_data
-from .inference import mwu, ttest
-from .models import BaseOutcomeModel, LinearModel, TabPFNModel, XGBoostModel
+from .context import ContextStore
+from .effect_estimation import ATEResult, aipw, difference_in_means
+from .engine import InferenceEngine
+from .hypothesis_testing import anova, kruskal, mwu, tost, ttest, welch_anova
+from .models import (
+    BaseOutcomeModel,
+    LinearModel,
+    PFNModel,
+    TabICLModel,
+    TabPFNModel,
+    XGBoostModel,
+)
 
 __all__ = [
     "ttest",
     "mwu",
-    "make_experiment_data",
+    "tost",
+    "anova",
+    "welch_anova",
+    "kruskal",
+    "difference_in_means",
+    "aipw",
+    "ATEResult",
+    "ContextStore",
+    "InferenceEngine",
     "BaseOutcomeModel",
     "LinearModel",
+    "PFNModel",
+    "TabICLModel",
     "TabPFNModel",
     "XGBoostModel",
     "__version__",

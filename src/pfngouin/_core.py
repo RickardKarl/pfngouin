@@ -8,33 +8,54 @@ Not part of the public API.
 from __future__ import annotations
 
 import numpy as np
+import pandas as pd
 
-from .models.base import BaseOutcomeModel
+from .engine import InferenceEngine
+from .models.base import _AnyModel
 
 
-def _validate_shapes(
-    control: np.ndarray,
-    treatment: np.ndarray,
-    covariates_control: np.ndarray,
-    covariates_treatment: np.ndarray,
-) -> None:
-    """Raise ValueError if outcome and covariate array lengths are inconsistent."""
-    if len(control) != len(covariates_control):
-        raise ValueError(
-            f"control has {len(control)} rows but covariates_control has "
-            f"{len(covariates_control)} rows."
+def _make_folds(
+    n: int,
+    n_splits: int,
+    random_state: int | None,
+    stratify_by: np.ndarray | None = None,
+) -> list[tuple[np.ndarray, np.ndarray]]:
+    """Return a list of (train_idx, val_idx) pairs for K-fold cross-validation.
+
+    When *stratify_by* is provided (integer class labels, shape ``(n,)``), folds
+    are balanced across classes using :class:`sklearn.model_selection.StratifiedKFold`.
+    Falls back to random shuffling if stratification fails (e.g. too few samples
+    per class).
+    """
+    if stratify_by is not None:
+        from sklearn.model_selection import StratifiedKFold
+
+        skf = StratifiedKFold(
+            n_splits=n_splits,
+            shuffle=True,
+            random_state=random_state if random_state is not None else 0,
         )
-    if len(treatment) != len(covariates_treatment):
-        raise ValueError(
-            f"treatment has {len(treatment)} rows but covariates_treatment has "
-            f"{len(covariates_treatment)} rows."
+        try:
+            return [(train, val) for train, val in skf.split(np.arange(n), stratify_by)]
+        except ValueError:
+            pass  # fall through to non-stratified
+
+    rng = np.random.default_rng(random_state)
+    shuffled = rng.permutation(n)
+    raw_folds = np.array_split(shuffled, n_splits)
+    return [
+        (
+            np.concatenate([raw_folds[j] for j in range(n_splits) if j != i]),
+            raw_folds[i],
         )
+        for i in range(n_splits)
+    ]
 
 
 def _crossfit_predict(
-    model: BaseOutcomeModel,
-    X: np.ndarray,
-    y: np.ndarray,
+    model: _AnyModel,
+    X: pd.DataFrame | np.ndarray,
+    y: pd.Series | np.ndarray,
     n_splits: int,
     random_state: int | None,
 ) -> np.ndarray:
@@ -43,83 +64,99 @@ def _crossfit_predict(
     adjust, preventing overfitting of the variance reduction step.
     """
     n = len(y)
-    rng = np.random.default_rng(random_state)
-    shuffled = rng.permutation(n)
-    folds = np.array_split(shuffled, n_splits)
-
     y_hat: np.ndarray = np.empty(n)
-    for i, val_idx in enumerate(folds):
-        train_idx = np.concatenate([f for j, f in enumerate(folds) if j != i])
-        model.fit(X[train_idx], y[train_idx])
-        y_hat[val_idx] = model.predict(X[val_idx])
-
+    use_df = isinstance(model, InferenceEngine) and isinstance(X, pd.DataFrame)
+    if not use_df:
+        X_np = X.to_numpy(dtype=float) if isinstance(X, pd.DataFrame) else X
+        y_arr = y.to_numpy(dtype=float) if isinstance(y, pd.Series) else y
+    for train_idx, val_idx in _make_folds(n, n_splits, random_state):
+        if use_df:
+            X_train = X.iloc[train_idx]
+            X_val_np = X.iloc[val_idx].to_numpy(dtype=float)
+            y_train = y.iloc[train_idx]
+        else:
+            X_train = X_np[train_idx]
+            X_val_np = X_np[val_idx]
+            y_train = y_arr[train_idx]
+        model.fit(X_train, y_train)
+        y_hat[val_idx] = model.predict(X_val_np)
     return y_hat
 
 
-def _adjust(
-    model: BaseOutcomeModel,
-    control: np.ndarray,
-    treatment: np.ndarray,
-    covariates_control: np.ndarray,
-    covariates_treatment: np.ndarray,
-    n_splits: int = 5,
-    random_state: int | None = None,
-) -> tuple[np.ndarray, np.ndarray, float]:
+def _cuped_core(
+    X: pd.DataFrame | np.ndarray,
+    y: pd.Series | np.ndarray,
+    model: _AnyModel,
+    n_splits: int,
+    random_state: int | None,
+) -> tuple[np.ndarray, float]:
     """
-    Fit the model on the full dataset (control + treatment combined) and return
-    covariate-adjusted outcomes for each group plus the variance reduction ratio.
+    Fit model on (X, y) and return CUPED-adjusted outcomes + variance reduction ratio.
 
-    If model.crossfit_required is True, cross-fitting is used to prevent
-    overfitting the adjustment. Otherwise, the model is fit on the full dataset
-    and used to predict directly.
-
-    Parameters
-    ----------
-    model                       : outcome model for variance reduction
-    control, treatment          : 1-D outcome arrays
-    covariates_control,
-    covariates_treatment        : 2-D covariate arrays, shape (n_users, n_features)
-    n_splits                    : number of cross-fitting folds (only used when
-                                  model.crossfit_required is True)
-    random_state                : random seed for reproducibility
-
-    Returns
-    -------
-    control_adj, treatment_adj  : adjusted outcome arrays
-    var_reduction               : fraction of variance explained (0–1)
+    This is the single source of truth for the CUPED formula used by _adjust_df.
     """
-    control = np.asarray(control, dtype=float)
-    treatment = np.asarray(treatment, dtype=float)
-    covariates_control = np.asarray(covariates_control, dtype=float)
-    covariates_treatment = np.asarray(covariates_treatment, dtype=float)
-
-    _validate_shapes(control, treatment, covariates_control, covariates_treatment)
-
-    X_ctrl = np.atleast_2d(covariates_control)
-    X_trt = np.atleast_2d(covariates_treatment)
-
-    # Combine across groups — theta must be estimated on the full dataset
-    X = np.vstack([X_ctrl, X_trt])
-    y = np.concatenate([control, treatment])
-
     if model.crossfit_required:
         y_pred = _crossfit_predict(model, X, y, n_splits, random_state)
     else:
-        model.fit(X, y)
-        y_pred = model.predict(X)
+        if isinstance(model, InferenceEngine) and isinstance(X, pd.DataFrame):
+            model.fit(X, y)
+            X_np = X.to_numpy(dtype=float)
+        else:
+            X_np = X.to_numpy(dtype=float) if isinstance(X, pd.DataFrame) else X
+            y_fit = y.to_numpy(dtype=float) if isinstance(y, pd.Series) else y
+            model.fit(X_np, y_fit)
+        y_pred = model.predict(X_np)
+
+    y_vals = y.to_numpy(dtype=float) if isinstance(y, pd.Series) else np.asarray(y, dtype=float)
 
     # Traditional CUPED formula: Y_adj = Y - θ * (ŷ - E[ŷ])
     # θ = Cov(Y, ŷ) / Var(ŷ) is the OLS coefficient that minimises residual variance.
-    theta = float(np.cov(y, y_pred)[0, 1] / np.var(y_pred))
-    y_adj = y - theta * (y_pred - y_pred.mean())
+    theta = float(np.cov(y_vals, y_pred)[0, 1] / np.var(y_pred))
+    y_adj = y_vals - theta * (y_pred - y_pred.mean())
 
     # Variance reduction: fraction of original variance removed by CUPED.
-    var_original = float(np.var(y))
+    var_original = float(np.var(y_vals))
     var_adjusted = float(np.var(y_adj))
     var_reduction = float(np.clip(1.0 - var_adjusted / var_original, 0.0, 1.0))
 
-    n_ctrl = len(control)
-    control_adj = y_adj[:n_ctrl]
-    treatment_adj = y_adj[n_ctrl:]
+    return np.asarray(y_adj), var_reduction
 
-    return control_adj, treatment_adj, var_reduction
+
+def _adjust_df(
+    data: pd.DataFrame,
+    dv: str,
+    covar: str | list[str],
+    model: _AnyModel,
+    n_splits: int = 5,
+    random_state: int | None = None,
+) -> tuple[pd.DataFrame, float]:
+    """
+    CUPED adjustment for DataFrame input (used by all tests).
+
+    Fits the model on the full dataset (all groups combined) and returns a
+    copy of `data` with the `dv` column replaced by CUPED-adjusted values,
+    plus the variance reduction ratio.
+
+    Parameters
+    ----------
+    data         : DataFrame containing outcome and covariate columns
+    dv           : name of the dependent variable (outcome) column
+    covar        : covariate column name(s) for CUPED adjustment
+    model        : outcome model for variance reduction
+    n_splits     : number of cross-fitting folds (used when model.crossfit_required)
+    random_state : random seed for reproducibility
+
+    Returns
+    -------
+    adjusted_data : copy of `data` with the `dv` column replaced by adjusted values
+    var_reduction : fraction of variance explained (0–1)
+    """
+    covar_cols = [covar] if isinstance(covar, str) else list(covar)
+    X = data[covar_cols]  # pd.DataFrame, column names preserved
+    y = data[dv]           # pd.Series with name=dv
+
+    y_adj, var_reduction = _cuped_core(X, y, model, n_splits, random_state)
+
+    adjusted_data = data.copy()
+    adjusted_data[dv] = y_adj
+    return adjusted_data, var_reduction

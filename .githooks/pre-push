@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+# Runs ruff linter before any push. Push is aborted if linting fails.
+echo "Running ruff check..."
+uv run ruff check .
+if [ $? -ne 0 ]; then
+    echo "Linting failed. Fix the errors above before pushing."
+    exit 1
+fi

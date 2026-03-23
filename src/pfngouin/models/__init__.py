@@ -1,6 +1,13 @@
 from .base import BaseOutcomeModel
 from .linear import LinearModel
-from .tabpfn import TabPFNModel
+from .pfn import PFNModel, TabICLModel, TabPFNModel
 from .xgboost import XGBoostModel
 
-__all__ = ["BaseOutcomeModel", "LinearModel", "TabPFNModel", "XGBoostModel"]
+__all__ = [
+    "BaseOutcomeModel",
+    "LinearModel",
+    "PFNModel",
+    "TabICLModel",
+    "TabPFNModel",
+    "XGBoostModel",
+]
