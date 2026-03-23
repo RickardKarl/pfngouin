@@ -25,12 +25,12 @@ from __future__ import annotations
 
 import pingouin as pg
 import pytest
-
-pytestmark = pytest.mark.simulations
+from _data import make_experiment_data, make_multigroup_df
 from tqdm import tqdm
 
 import pfngouin as pfg
-from _data import make_experiment_data, make_multigroup_df
+
+pytestmark = pytest.mark.simulations
 
 # ---------------------------------------------------------------------------
 # Parameters
@@ -61,7 +61,7 @@ def _pg_ttest(
     between: object,
     **_: object,
 ) -> object:
-    import pandas as pd
+
     df = data  # type: ignore[assignment]
     groups = sorted(df[between].unique())  # type: ignore[index]
     x = df.loc[df[between] == groups[1], dv]  # type: ignore[index]
@@ -284,34 +284,34 @@ def test_mwu_type1_error_tabpfn(tabpfn_model: pfg.PFNModel) -> None:
 
 def test_ttest_power_no_adjustment() -> None:
     power = _estimate_rejection_rate(_pg_ttest, None, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 def test_ttest_power_linear(linear_model: pfg.LinearModel) -> None:
     power = _estimate_rejection_rate(pfg.ttest, linear_model, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
 @pytest.mark.xgboost
 def test_ttest_power_xgboost(xgboost_model: pfg.XGBoostModel) -> None:
     power = _estimate_rejection_rate(pfg.ttest, xgboost_model, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
 @pytest.mark.pfn
 def test_ttest_power_tabpfn(tabpfn_model: pfg.PFNModel) -> None:
     power = _estimate_rejection_rate(pfg.ttest, tabpfn_model, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"ttest power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -321,34 +321,34 @@ def test_ttest_power_tabpfn(tabpfn_model: pfg.PFNModel) -> None:
 
 def test_mwu_power_no_adjustment() -> None:
     power = _estimate_rejection_rate(_pg_mwu, None, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 def test_mwu_power_linear(linear_model: pfg.LinearModel) -> None:
     power = _estimate_rejection_rate(pfg.mwu, linear_model, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
 @pytest.mark.xgboost
 def test_mwu_power_xgboost(xgboost_model: pfg.XGBoostModel) -> None:
     power = _estimate_rejection_rate(pfg.mwu, xgboost_model, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
 @pytest.mark.pfn
 def test_mwu_power_tabpfn(tabpfn_model: pfg.PFNModel) -> None:
     power = _estimate_rejection_rate(pfg.mwu, tabpfn_model, effect=EFFECT_SIZE)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"mwu power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -387,34 +387,34 @@ def test_tost_type1_error_tabpfn(tabpfn_model: pfg.PFNModel) -> None:
 
 def test_tost_power_no_adjustment() -> None:
     power = _estimate_rejection_rate(_pg_tost, None, effect=0)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"tost power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"tost power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 def test_tost_power_linear(linear_model: pfg.LinearModel) -> None:
     power = _estimate_rejection_rate(_pfg_tost, linear_model, effect=0)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"tost power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"tost power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
 @pytest.mark.xgboost
 def test_tost_power_xgboost(xgboost_model: pfg.XGBoostModel) -> None:
     power = _estimate_rejection_rate(_pfg_tost, xgboost_model, effect=0)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"tost power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"tost power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
 @pytest.mark.pfn
 def test_tost_power_tabpfn(tabpfn_model: pfg.PFNModel) -> None:
     power = _estimate_rejection_rate(_pfg_tost, tabpfn_model, effect=0)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"tost power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"tost power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -459,18 +459,18 @@ def test_anova_type1_error_tabpfn(tabpfn_model: pfg.PFNModel) -> None:
 
 def test_anova_power_no_adjustment() -> None:
     power = _estimate_rejection_rate_multi_group(_pg_anova, None, MULTI_EFFECTS_POWER)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 def test_anova_power_linear(linear_model: pfg.LinearModel) -> None:
     power = _estimate_rejection_rate_multi_group(
         pfg.anova, linear_model, MULTI_EFFECTS_POWER
     )
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
@@ -479,9 +479,9 @@ def test_anova_power_xgboost(xgboost_model: pfg.XGBoostModel) -> None:
     power = _estimate_rejection_rate_multi_group(
         pfg.anova, xgboost_model, MULTI_EFFECTS_POWER
     )
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
@@ -490,9 +490,9 @@ def test_anova_power_tabpfn(tabpfn_model: pfg.PFNModel) -> None:
     power = _estimate_rejection_rate_multi_group(
         pfg.anova, tabpfn_model, MULTI_EFFECTS_POWER
     )
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -504,18 +504,18 @@ def test_welch_anova_type1_error_no_adjustment() -> None:
     fpr = _estimate_rejection_rate_multi_group(
         _pg_welch_anova, None, MULTI_EFFECTS_NULL
     )
-    assert (
-        fpr < FPR_THRESHOLD
-    ), f"welch_anova FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    assert fpr < FPR_THRESHOLD, (
+        f"welch_anova FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    )
 
 
 def test_welch_anova_type1_error_linear(linear_model: pfg.LinearModel) -> None:
     fpr = _estimate_rejection_rate_multi_group(
         pfg.welch_anova, linear_model, MULTI_EFFECTS_NULL
     )
-    assert (
-        fpr < FPR_THRESHOLD
-    ), f"welch_anova FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    assert fpr < FPR_THRESHOLD, (
+        f"welch_anova FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
@@ -524,9 +524,9 @@ def test_welch_anova_type1_error_xgboost(xgboost_model: pfg.XGBoostModel) -> Non
     fpr = _estimate_rejection_rate_multi_group(
         pfg.welch_anova, xgboost_model, MULTI_EFFECTS_NULL
     )
-    assert (
-        fpr < FPR_THRESHOLD
-    ), f"welch_anova FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    assert fpr < FPR_THRESHOLD, (
+        f"welch_anova FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
@@ -535,9 +535,9 @@ def test_welch_anova_type1_error_tabpfn(tabpfn_model: pfg.PFNModel) -> None:
     fpr = _estimate_rejection_rate_multi_group(
         pfg.welch_anova, tabpfn_model, MULTI_EFFECTS_NULL
     )
-    assert (
-        fpr < FPR_THRESHOLD
-    ), f"welch_anova FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    assert fpr < FPR_THRESHOLD, (
+        f"welch_anova FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -549,18 +549,18 @@ def test_welch_anova_power_no_adjustment() -> None:
     power = _estimate_rejection_rate_multi_group(
         _pg_welch_anova, None, MULTI_EFFECTS_POWER
     )
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"welch_anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"welch_anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 def test_welch_anova_power_linear(linear_model: pfg.LinearModel) -> None:
     power = _estimate_rejection_rate_multi_group(
         pfg.welch_anova, linear_model, MULTI_EFFECTS_POWER
     )
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"welch_anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"welch_anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
@@ -569,9 +569,9 @@ def test_welch_anova_power_xgboost(xgboost_model: pfg.XGBoostModel) -> None:
     power = _estimate_rejection_rate_multi_group(
         pfg.welch_anova, xgboost_model, MULTI_EFFECTS_POWER
     )
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"welch_anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"welch_anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
@@ -580,9 +580,9 @@ def test_welch_anova_power_tabpfn(tabpfn_model: pfg.PFNModel) -> None:
     power = _estimate_rejection_rate_multi_group(
         pfg.welch_anova, tabpfn_model, MULTI_EFFECTS_POWER
     )
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"welch_anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"welch_anova power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -592,18 +592,18 @@ def test_welch_anova_power_tabpfn(tabpfn_model: pfg.PFNModel) -> None:
 
 def test_kruskal_type1_error_no_adjustment() -> None:
     fpr = _estimate_rejection_rate_multi_group(_pg_kruskal, None, MULTI_EFFECTS_NULL)
-    assert (
-        fpr < FPR_THRESHOLD
-    ), f"kruskal FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    assert fpr < FPR_THRESHOLD, (
+        f"kruskal FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    )
 
 
 def test_kruskal_type1_error_linear(linear_model: pfg.LinearModel) -> None:
     fpr = _estimate_rejection_rate_multi_group(
         pfg.kruskal, linear_model, MULTI_EFFECTS_NULL
     )
-    assert (
-        fpr < FPR_THRESHOLD
-    ), f"kruskal FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    assert fpr < FPR_THRESHOLD, (
+        f"kruskal FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
@@ -612,9 +612,9 @@ def test_kruskal_type1_error_xgboost(xgboost_model: pfg.XGBoostModel) -> None:
     fpr = _estimate_rejection_rate_multi_group(
         pfg.kruskal, xgboost_model, MULTI_EFFECTS_NULL
     )
-    assert (
-        fpr < FPR_THRESHOLD
-    ), f"kruskal FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    assert fpr < FPR_THRESHOLD, (
+        f"kruskal FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
@@ -623,9 +623,9 @@ def test_kruskal_type1_error_tabpfn(tabpfn_model: pfg.PFNModel) -> None:
     fpr = _estimate_rejection_rate_multi_group(
         pfg.kruskal, tabpfn_model, MULTI_EFFECTS_NULL
     )
-    assert (
-        fpr < FPR_THRESHOLD
-    ), f"kruskal FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    assert fpr < FPR_THRESHOLD, (
+        f"kruskal FPR={fpr:.3f} exceeds threshold {FPR_THRESHOLD}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -635,18 +635,18 @@ def test_kruskal_type1_error_tabpfn(tabpfn_model: pfg.PFNModel) -> None:
 
 def test_kruskal_power_no_adjustment() -> None:
     power = _estimate_rejection_rate_multi_group(_pg_kruskal, None, MULTI_EFFECTS_POWER)
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"kruskal power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"kruskal power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 def test_kruskal_power_linear(linear_model: pfg.LinearModel) -> None:
     power = _estimate_rejection_rate_multi_group(
         pfg.kruskal, linear_model, MULTI_EFFECTS_POWER
     )
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"kruskal power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"kruskal power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
@@ -655,9 +655,9 @@ def test_kruskal_power_xgboost(xgboost_model: pfg.XGBoostModel) -> None:
     power = _estimate_rejection_rate_multi_group(
         pfg.kruskal, xgboost_model, MULTI_EFFECTS_POWER
     )
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"kruskal power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"kruskal power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )
 
 
 @pytest.mark.ml_models
@@ -666,6 +666,6 @@ def test_kruskal_power_tabpfn(tabpfn_model: pfg.PFNModel) -> None:
     power = _estimate_rejection_rate_multi_group(
         pfg.kruskal, tabpfn_model, MULTI_EFFECTS_POWER
     )
-    assert (
-        power >= POWER_THRESHOLD
-    ), f"kruskal power={power:.3f} below threshold {POWER_THRESHOLD}"
+    assert power >= POWER_THRESHOLD, (
+        f"kruskal power={power:.3f} below threshold {POWER_THRESHOLD}"
+    )

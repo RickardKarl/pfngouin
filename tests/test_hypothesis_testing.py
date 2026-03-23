@@ -8,7 +8,9 @@ import pfngouin as pfg
 # ---------------------------------------------------------------------------
 
 
-def test_ttest_returns_dataframe(ab_data: pd.DataFrame, linear_model: pfg.LinearModel) -> None:
+def test_ttest_returns_dataframe(
+    ab_data: pd.DataFrame, linear_model: pfg.LinearModel
+) -> None:
     result = pfg.ttest(
         ab_data,
         dv="outcome",
@@ -37,7 +39,9 @@ def test_ttest_var_reduction_in_range(
     assert 0.0 <= vr <= 1.0
 
 
-def test_ttest_reduces_pvalue(ab_data: pd.DataFrame, linear_model: pfg.LinearModel) -> None:
+def test_ttest_reduces_pvalue(
+    ab_data: pd.DataFrame, linear_model: pfg.LinearModel
+) -> None:
     import pingouin as pg
 
     # With a strong covariate (fixed seed), adjusted p-value should be <= original.
@@ -60,7 +64,9 @@ def test_ttest_reduces_pvalue(ab_data: pd.DataFrame, linear_model: pfg.LinearMod
 # ---------------------------------------------------------------------------
 
 
-def test_mwu_returns_dataframe(ab_data: pd.DataFrame, linear_model: pfg.LinearModel) -> None:
+def test_mwu_returns_dataframe(
+    ab_data: pd.DataFrame, linear_model: pfg.LinearModel
+) -> None:
     result = pfg.mwu(
         ab_data,
         dv="outcome",
@@ -89,7 +95,9 @@ def test_mwu_var_reduction_in_range(
     assert 0.0 <= vr <= 1.0
 
 
-def test_mwu_reduces_pvalue(ab_data: pd.DataFrame, linear_model: pfg.LinearModel) -> None:
+def test_mwu_reduces_pvalue(
+    ab_data: pd.DataFrame, linear_model: pfg.LinearModel
+) -> None:
     import pingouin as pg
 
     trt = ab_data.loc[ab_data["group"] == "treatment", "outcome"]
@@ -111,7 +119,9 @@ def test_mwu_reduces_pvalue(ab_data: pd.DataFrame, linear_model: pfg.LinearModel
 # ---------------------------------------------------------------------------
 
 
-def test_tost_returns_dataframe(ab_data: pd.DataFrame, linear_model: pfg.LinearModel) -> None:
+def test_tost_returns_dataframe(
+    ab_data: pd.DataFrame, linear_model: pfg.LinearModel
+) -> None:
     result = pfg.tost(
         ab_data,
         dv="outcome",
@@ -141,7 +151,9 @@ def test_tost_var_reduction_in_range(
     assert 0.0 <= vr <= 1.0
 
 
-def test_tost_reduces_pvalue(ab_data: pd.DataFrame, linear_model: pfg.LinearModel) -> None:
+def test_tost_reduces_pvalue(
+    ab_data: pd.DataFrame, linear_model: pfg.LinearModel
+) -> None:
     import pingouin as pg
 
     # ab_data has treatment effect=2.0; bound=3.0 includes this, so tost
@@ -173,7 +185,9 @@ def test_ttest_non_binary_between_raises(
     data = ab_data.copy()
     data.loc[data.index[:10], "group"] = "other"
     with pytest.raises(ValueError, match="exactly 2 groups"):
-        pfg.ttest(data, dv="outcome", between="group", covar="pre_revenue", model=linear_model)
+        pfg.ttest(
+            data, dv="outcome", between="group", covar="pre_revenue", model=linear_model
+        )
 
 
 # ---------------------------------------------------------------------------

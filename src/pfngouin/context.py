@@ -22,7 +22,8 @@ class ContextStore:
         """Register a prior experiment DataFrame. Stores df as-is."""
         if "_source" in df.columns:
             raise ValueError(
-                f"DataFrame '{name}' already contains a '_source' column; rename it before adding to the store."
+                f"DataFrame '{name}' already contains a '_source' column; "
+                "rename it before adding to the store."
             )
         self._store[name] = df
 

@@ -3,10 +3,10 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 import pytest
+from _data import make_experiment_data
 
 from pfngouin import ATEResult, ContextStore, InferenceEngine, aipw
 from pfngouin.models import LinearModel
-from _data import make_experiment_data
 
 
 def _prepare(N: int = 200, effect: float = 1.0, seed: int = 42) -> pd.DataFrame:

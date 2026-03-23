@@ -51,7 +51,9 @@ def make_experiment_data(
     outcome[in_treatment] += effect
 
     group = np.where(in_treatment, "treatment", "control")
-    return pd.DataFrame({"outcome": outcome, "group": group, "pre1": pre1, "pre2": pre2, "pre3": pre3})
+    return pd.DataFrame(
+        {"outcome": outcome, "group": group, "pre1": pre1, "pre2": pre2, "pre3": pre3}
+    )
 
 
 def make_multigroup_df(

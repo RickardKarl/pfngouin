@@ -5,11 +5,10 @@ Tests for effect_estimation.py (ATEResult and aipw).
 from __future__ import annotations
 
 import pandas as pd
-import pytest
+from _data import make_experiment_data
 
 from pfngouin import ATEResult, aipw
 from pfngouin.models import LinearModel
-from _data import make_experiment_data
 
 
 def _prepare(N: int = 200, effect: float = 1.0, seed: int = 42) -> pd.DataFrame:
@@ -27,7 +26,13 @@ _COVARIATES = ["pre1", "pre2", "pre3"]
 
 def test_aipw_result_fields() -> None:
     df = _prepare()
-    result = aipw(df, outcome="outcome", treatment="treated", covariates=_COVARIATES, model=LinearModel())
+    result = aipw(
+        df,
+        outcome="outcome",
+        treatment="treated",
+        covariates=_COVARIATES,
+        model=LinearModel(),
+    )
     assert isinstance(result, ATEResult)
     assert isinstance(result.ate, float)
     assert isinstance(result.ci, tuple) and len(result.ci) == 2
@@ -36,20 +41,38 @@ def test_aipw_result_fields() -> None:
 
 def test_variance_reduction_range() -> None:
     df = _prepare()
-    result = aipw(df, outcome="outcome", treatment="treated", covariates=_COVARIATES, model=LinearModel())
+    result = aipw(
+        df,
+        outcome="outcome",
+        treatment="treated",
+        covariates=_COVARIATES,
+        model=LinearModel(),
+    )
     assert 0.0 <= result.variance_reduction <= 1.0
 
 
 def test_ci_contains_true_effect() -> None:
     true_ate = 2.0
     df = _prepare(N=500, effect=true_ate, seed=7)
-    result = aipw(df, outcome="outcome", treatment="treated", covariates=_COVARIATES, model=LinearModel())
+    result = aipw(
+        df,
+        outcome="outcome",
+        treatment="treated",
+        covariates=_COVARIATES,
+        model=LinearModel(),
+    )
     assert result.ci[0] <= true_ate <= result.ci[1]
 
 
 def test_aipw_string_covariates() -> None:
     df = _prepare()
-    result = aipw(df, outcome="outcome", treatment="treated", covariates="pre1", model=LinearModel())
+    result = aipw(
+        df,
+        outcome="outcome",
+        treatment="treated",
+        covariates="pre1",
+        model=LinearModel(),
+    )
     assert isinstance(result, ATEResult)
     assert 0.0 <= result.variance_reduction <= 1.0
 

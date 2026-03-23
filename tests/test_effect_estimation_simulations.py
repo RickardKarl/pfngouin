@@ -17,12 +17,13 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-
-pytestmark = pytest.mark.simulations
+from _data import make_experiment_data
 from tqdm import tqdm
 
 import pfngouin as pfg
-from _data import make_experiment_data
+
+pytestmark = pytest.mark.simulations
+
 
 # ---------------------------------------------------------------------------
 # Parameters
@@ -42,7 +43,10 @@ BIAS_SIGMAS = 2.0  # bias must be < this many Monte Carlo SEs
 
 
 def _run_dim_simulations() -> dict[str, np.ndarray]:
-    """Run N_SIMS replications of difference-in-means and return ate estimates and CI hit indicators."""
+    """
+    Run N_SIMS replications of difference-in-means
+    and return ate estimates and CI hit indicators.
+    """
     ates = np.empty(N_SIMS)
     hits = np.empty(N_SIMS, dtype=bool)
 
@@ -96,9 +100,9 @@ def _assert_bias(results: dict[str, np.ndarray], label: str) -> None:
     ates = results["ates"]
     bias = ates.mean() - TRUE_EFFECT
     mcse = ates.std(ddof=1) / np.sqrt(N_SIMS)
-    assert (
-        abs(bias) < BIAS_SIGMAS * mcse
-    ), f"{label} bias={bias:.4f} exceeds {BIAS_SIGMAS} MCSE ({BIAS_SIGMAS * mcse:.4f})"
+    assert abs(bias) < BIAS_SIGMAS * mcse, (
+        f"{label} bias={bias:.4f} exceeds {BIAS_SIGMAS} MCSE ({BIAS_SIGMAS * mcse:.4f})"
+    )
 
 
 def _assert_coverage(results: dict[str, np.ndarray], label: str) -> None:
@@ -151,7 +155,9 @@ def test_dim_bias_and_coverage(dim_simulation_results: dict[str, np.ndarray]) ->
 # ---------------------------------------------------------------------------
 
 
-def test_aipw_bias_and_coverage_linear(linear_simulation_results: dict[str, np.ndarray]) -> None:
+def test_aipw_bias_and_coverage_linear(
+    linear_simulation_results: dict[str, np.ndarray],
+) -> None:
     _assert_bias(linear_simulation_results, "LinearModel")
     _assert_coverage(linear_simulation_results, "LinearModel")
 
@@ -163,7 +169,9 @@ def test_aipw_bias_and_coverage_linear(linear_simulation_results: dict[str, np.n
 
 @pytest.mark.ml_models
 @pytest.mark.xgboost
-def test_aipw_bias_and_coverage_xgboost(xgboost_simulation_results: dict[str, np.ndarray]) -> None:
+def test_aipw_bias_and_coverage_xgboost(
+    xgboost_simulation_results: dict[str, np.ndarray],
+) -> None:
     _assert_bias(xgboost_simulation_results, "XGBoostModel")
     _assert_coverage(xgboost_simulation_results, "XGBoostModel")
 
@@ -175,6 +183,8 @@ def test_aipw_bias_and_coverage_xgboost(xgboost_simulation_results: dict[str, np
 
 @pytest.mark.ml_models
 @pytest.mark.pfn
-def test_aipw_bias_and_coverage_pfn(pfn_simulation_results: dict[str, np.ndarray]) -> None:
+def test_aipw_bias_and_coverage_pfn(
+    pfn_simulation_results: dict[str, np.ndarray],
+) -> None:
     _assert_bias(pfn_simulation_results, "PFNModel")
     _assert_coverage(pfn_simulation_results, "PFNModel")

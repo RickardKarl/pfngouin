@@ -107,7 +107,11 @@ def _cuped_core(
             model.fit(X_np, y_fit)
         y_pred = model.predict(X_np)
 
-    y_vals = y.to_numpy(dtype=float) if isinstance(y, pd.Series) else np.asarray(y, dtype=float)
+    y_vals = (
+        y.to_numpy(dtype=float)
+        if isinstance(y, pd.Series)
+        else np.asarray(y, dtype=float)
+    )
 
     # Traditional CUPED formula: Y_adj = Y - θ * (ŷ - E[ŷ])
     # θ = Cov(Y, ŷ) / Var(ŷ) is the OLS coefficient that minimises residual variance.
@@ -153,7 +157,7 @@ def _adjust_df(
     """
     covar_cols = [covar] if isinstance(covar, str) else list(covar)
     X = data[covar_cols]  # pd.DataFrame, column names preserved
-    y = data[dv]           # pd.Series with name=dv
+    y = data[dv]  # pd.Series with name=dv
 
     y_adj, var_reduction = _cuped_core(X, y, model, n_splits, random_state)
 
